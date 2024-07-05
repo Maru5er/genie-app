@@ -3,10 +3,27 @@ import './globals.css'
 import Navbar from './components/navbar';
 import {Switch, Textarea} from '@headlessui/react';
 import { useState } from 'react';
+import { ImageGallery } from 'react-image-grid-gallery';
+import { RingLoader } from 'react-spinners';
+
 
 
 export default function Home() {
   const [enabled, setEnabled] = useState(false);
+  const [generated, setGenerated] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const imagesArray = [
+    {
+      alt: "Image1's alt text",
+      caption: "Image1's description",
+      src: "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg",
+    },
+    {
+      alt: "Image2's alt text",
+      caption: "Image2's description",
+      src: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg",
+    }
+  ]
 
   return (
     <div>
@@ -49,9 +66,34 @@ export default function Home() {
             </div>
           )}
         </div>
-        <button className='mt-40 border-2 border-gray-300 p-2 hover:bg-white hover:text-black'>
+        <button className='mt-40 border-2 border-gray-300 p-2 hover:bg-white hover:text-black'
+          onClick={setGenerated}
+        >
           Generate
         </button>
+        
+        <div className="mt-10">
+          {loaded ? (
+              <ImageGallery 
+              imagesInfoArray={imagesArray}
+              columnCount={"auto"}
+              columnWidth={230}
+              gapSize={24}
+            />
+          ) : (
+            <div >
+              <RingLoader 
+                color='white'
+                loading={generated}
+                size={150}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
+            </div>
+          )}
+          
+        </div>
+        
       </div>
     </div>
   );
