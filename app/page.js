@@ -7,6 +7,10 @@ import { ImageGallery } from 'react-image-grid-gallery';
 import { RingLoader } from 'react-spinners';
 
 
+function generateImages() {
+  
+}
+
 
 export default function Home() {
   const [enabled, setEnabled] = useState(false);
