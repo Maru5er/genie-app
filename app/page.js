@@ -29,19 +29,11 @@ export default function Home() {
       });
       
       const data = await res.json();
-      if (data == null) {
-        alert("Your content violates our community guidelines");
-      } else {
-        setImagesArray(data['images']);
-      }
-      
+      setImagesArray(data['images']);
     } catch (error) {
       console.error('Error during fetch:', error);
     } finally {
       setLoaded(true);
-      if (imagesArray == []) {
-        console.log("probably not pg");
-      }
     }
     
   }
