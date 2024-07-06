@@ -2,32 +2,49 @@
 import './globals.css'
 import Navbar from './components/navbar';
 import {Switch, Textarea} from '@headlessui/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ImageGallery } from 'react-image-grid-gallery';
 import { RingLoader } from 'react-spinners';
 
-
-function generateImages() {
-  
-}
 
 
 export default function Home() {
   const [enabled, setEnabled] = useState(false);
   const [generated, setGenerated] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const imagesArray = [
-    {
-      alt: "Image1's alt text",
-      caption: "Image1's description",
-      src: "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg",
-    },
-    {
-      alt: "Image2's alt text",
-      caption: "Image2's description",
-      src: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg",
+  const [imagesArray, setImagesArray] = useState([]);
+  const [text, setText] = useState('');
+
+  async function getImages() {
+    console.log(process.env.NEXT_PUBLIC_SERVER_HOST);
+    setGenerated(true);
+    setLoaded(false);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_HOST}/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type' : 'application/json',
+        },
+        body : JSON.stringify({'story' : text})
+      });
+      
+      const data = await res.json();
+      if (data == null) {
+        alert("Your content violates our community guidelines");
+      } else {
+        setImagesArray(data['images']);
+      }
+      
+    } catch (error) {
+      console.error('Error during fetch:', error);
+    } finally {
+      setLoaded(true);
+      if (imagesArray == []) {
+        console.log("probably not pg");
+      }
     }
-  ]
+    
+  }
 
   return (
     <div>
@@ -66,12 +83,13 @@ export default function Home() {
           ) : (
             <div className='h-32 w-full md:w-96'>
               <label htmlFor="textInput" className="block text-lg mt-4">Text Input:</label>
-              <textarea style={{resize:'none', width:'80vw', marginLeft:'10vw'}}id="textInput" rows="8" className="absolute left-0 mt-2 p-2 border-4 border-gray-300 rounded w-4/5 text-black"></textarea>
+              <textarea value = {text} style={{resize:'none', width:'80vw', marginLeft:'10vw'}}id="textInput" rows="8" className="absolute left-0 mt-2 p-2 border-4 border-gray-300 rounded w-4/5 text-black"
+                        onChange={(e) => setText(e.target.value)}></textarea>
             </div>
           )}
         </div>
         <button className='mt-40 border-2 border-gray-300 p-2 hover:bg-white hover:text-black'
-          onClick={setGenerated}
+          onClick={getImages}
         >
           Generate
         </button>
@@ -89,7 +107,6 @@ export default function Home() {
               <RingLoader 
                 color='white'
                 loading={generated}
-                size={150}
                 aria-label="Loading Spinner"
                 data-testid="loader"
               />
