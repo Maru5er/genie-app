@@ -28,7 +28,7 @@ export default function Home() {
     setLoaded(false);
     try {
       var input = text;
-      input += `Generate ${imageNumber} images in ${style} style`;
+      input += `Generate ${imageNumber} images in a ${style} art-style`;
       const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_HOST}/stream`, {
         method: 'POST',
         headers: {
