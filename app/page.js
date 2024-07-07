@@ -17,7 +17,9 @@ export default function Home() {
   const [text, setText] = useState('');
   const [style, setStyle] = useState('Claymation');
   const [imageNumber, setImageNumber] = useState('3');
+  const [audioFile, setAudioFile] = useState(null); 
 
+  
   async function getImages() {
     if (text == '') {
       alert('Textarea is empty');
@@ -44,8 +46,47 @@ export default function Home() {
     } finally {
       setLoaded(true);
     }
-    
   }
+
+  const handleFileChange = (event) => {
+    setAudioFile(null);
+    const file = event.target.files[0];
+    setAudioFile(file);
+  }
+
+
+  async function parseAudio() {
+    if (!audioFile) {
+      alert('Please select an audio file');
+      return;
+    }
+    const formData = new FormData();
+
+    formData.append('file', audioFile);
+    formData.append('model', 'whisper-1');
+    formData.append('respond_format', 'json');
+    console.log(formData);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_HOST}/parseAudio`, {
+        method: 'POST',
+        body : formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send audio file');
+      }
+
+      const result = await response.json();
+      console.log(result);
+      setText(result['text']);
+    } catch (error) {
+      console.error('Error during fetch: ', error)
+    } finally {
+      setEnabled(false);
+    }
+  }
+
 
   return (
     <div>
@@ -79,7 +120,16 @@ export default function Home() {
           {enabled ? (
             <div className='h-32 w-full mb-40'>
               <label htmlFor="audioInput" className="block text-lg mt-4">Audio Input:</label>
-              <input type="file" id="audioInput" accept="audio/*" className="mt-2 p-2 border border-gray-300 rounded"/>
+              <input placeholder={audioFile ? audioFile.name : "No file chosen"} type="file" id="audioInput" accept="audio/*" className="mt-2 p-2 border border-gray-300 rounded" onChange={handleFileChange}/>
+              {audioFile && (
+                <div className='flex flex-col justify-center m-4 items-center w-full'>
+                  <audio controls>
+                  <source src={URL.createObjectURL(audioFile)} type={audioFile.type} />
+                  Your browser doesn't support this audio type
+                  </audio>
+                  <p className='m-2'>The transcribed audio will appear in the text-input box after it is parsed</p>
+                </div>
+              )}
             </div>
           ) : (
             <div className='h-32 w-full md:w-96 mb-40'>
@@ -104,9 +154,9 @@ export default function Home() {
             </Select>
           </Field>
           <button className='m-2 border-2 mh-4 border-gray-300 p-2 hover:bg-white hover:text-black'
-            onClick={getImages}
+            onClick={enabled ? parseAudio : getImages}
           >
-            Generate
+            {enabled ? "Parse Audio" : "Generate"}
           </button>
           <Field>
             <Label>Number of images</Label>
