@@ -129,7 +129,7 @@ export default function Home() {
                 <div className='flex flex-col justify-center m-4 items-center w-full'>
                   <audio controls>
                   <source src={URL.createObjectURL(audioFile)} type={audioFile.type} />
-                  Your browser doesn't support this audio type
+                  Your browser doesn{`&apos`}t support this audio type
                   </audio>
                   <p className='m-2'>The transcribed audio will appear in the text-input box after it is parsed</p>
                 </div>
