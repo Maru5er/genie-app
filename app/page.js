@@ -79,7 +79,11 @@ export default function Home() {
 
       const result = await response.json();
       console.log(result);
-      setText(result['text']);
+      if (result['text']) {
+        setText(result['text']);
+      } else {
+        setText('Failed to parse audio');
+      }
     } catch (error) {
       console.error('Error during fetch: ', error)
     } finally {
@@ -91,7 +95,7 @@ export default function Home() {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-col justify-center items-center h-screen text-center p-4">
+      <div className="flex flex-col justify-center items-center text-center p-4 min-h-screen">
         <h1 className="text-3xl md:text-5xl border-b-50 pb-4 mb-8">Welcome to Genie! <br /> Make your story come to life</h1>
         <div className="flex items-center space-x-4">
             <div className="relative inline-block w-40 h-10">
@@ -134,15 +138,15 @@ export default function Home() {
           ) : (
             <div className='h-32 w-full md:w-96 mb-40'>
               <label htmlFor="textInput" className="block text-lg mt-4">Text Input:</label>
-              <textarea value = {text} style={{resize:'none', width:'80vw', marginLeft:'10vw'}}id="textInput" rows="8" className="absolute left-0 mt-2 p-2 border-4 border-gray-300 rounded w-4/5 text-black"
+              <textarea placeholder="Your story goes here..." value = {text} style={{resize:'none', width:'80vw', marginLeft:'10vw'}} id="textInput" rows="8" className="absolute left-0 mt-2 p-2 border-4 border-gray-300 rounded w-4/5 text-black bg-gray-200"
                         onChange={(e) => setText(e.target.value)}></textarea>
             </div>
           )}
         </div>
-        <div className='flex flex-row justify-center'>
+        <div className='flex flex-row justify-center w-100'>
         <Field>
             <Label>Select the style for the image</Label>
-            <Select value={style} className='border-2 m-2 p-2 data-[hover]:shadow data-[focus]:bg-gray-500' aria-label='Style'
+            <Select value={style} className='border-2 m-2 p-2 data-[hover]:shadow data-[focus]:bg-gray-500 text-gray-800 bg-gray-200' aria-label='Style'
                     onChange={(e) => setStyle(e.target.value)}>
               <option value='Claymation'>Claymation</option>
               <option value='Gothic'>Gothic</option>
@@ -153,14 +157,14 @@ export default function Home() {
               <option value="Children's Drawing">Children Drawing</option>
             </Select>
           </Field>
-          <button className='m-2 border-2 mh-4 border-gray-300 p-2 hover:bg-white hover:text-black'
+          <button className='m-2 border-2 mh-4 border-gray-300 p-1 hover:bg-white hover:text-black w-40'
             onClick={enabled ? parseAudio : getImages}
           >
-            {enabled ? "Parse Audio" : "Generate"}
+            {enabled ? "Parse " : "Generate"}
           </button>
           <Field>
             <Label>Number of images</Label>
-            <Select value={imageNumber} className='border-2 m-2 p-2 data-[hover]:shadow data-[focus]:bg-gray-500' aria-label='Style'
+            <Select value={imageNumber} className='border-2 m-2 p-2 data-[hover]:shadow data-[focus]:bg-gray-500 text-gray-800 bg-gray-200' aria-label='Style'
                     onChange={(e) => setImageNumber(e.target.value)}>
               <option value='1'>1</option>
               <option value='2'>2</option>
@@ -180,6 +184,7 @@ export default function Home() {
               imagesInfoArray={imagesArray}
               columnCount={"auto"}
               columnWidth={230}
+              size={"auto"}
               gapSize={24}
             />
           ) : (
